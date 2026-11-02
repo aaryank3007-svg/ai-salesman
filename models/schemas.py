@@ -62,6 +62,7 @@ class OrderParseResult(BaseModel):
     items: List[ParsedOrderItem] = []
     unmatched_queries: List[str] = []
     clarification_questions: List[str] = []
+    applied_schemes: List[str] = []
     subtotal: float = 0.0
     discount: float = 0.0
     total_amount: float = 0.0

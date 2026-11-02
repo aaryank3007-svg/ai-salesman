@@ -153,6 +153,19 @@ class OrderParser:
         discount = round(subtotal * 0.02, 2) if subtotal >= 10000 else 0.0
         total_amount = round(subtotal - discount, 2)
 
+        applied_schemes = []
+        if discount > 0:
+            applied_schemes.append(f"🎁 2% Distributor Bulk Order Discount (Saved ₹{discount:,.2f})")
+        
+        # Check active promotional schemes
+        for it in parsed_items:
+            sch = query_one("SELECT * FROM schemes WHERE product_id = ? AND is_active = 1", (it.product_id,))
+            if sch and it.ordered_unit == "carton" and it.ordered_quantity >= sch["min_quantity"]:
+                if sch["free_product_id"]:
+                    free_prod = query_one("SELECT name FROM products WHERE id = ?", (sch["free_product_id"],))
+                    fp_name = free_prod["name"] if free_prod else "Bonus SKU"
+                    applied_schemes.append(f"🎉 Promotion: {sch['name']} (Qualified for {sch['free_quantity']} Free Pieces of {fp_name})")
+
         ready = (
             len(parsed_items) > 0 and
             all(not item.is_ambiguous for item in parsed_items) and
@@ -167,6 +180,7 @@ class OrderParser:
             items=parsed_items,
             unmatched_queries=unmatched,
             clarification_questions=clarifications,
+            applied_schemes=applied_schemes,
             subtotal=subtotal,
             discount=discount,
             total_amount=total_amount,

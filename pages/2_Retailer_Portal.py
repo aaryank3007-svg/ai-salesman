@@ -121,3 +121,4 @@ with tab_hist:
                         st.error(rep_res["message"])
     else:
         st.info("No past orders found for this retailer.")
+

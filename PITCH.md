@@ -31,3 +31,4 @@ An AI-powered voice ordering and distributor management platform:
 ## 📈 Market Size & Business Model
 - **TAM:** $50B Indian B2B FMCG distribution market.
 - **Business Model:** B2B SaaS subscription for distributors (₹2,999/month per warehouse) + pay-per-voice order API fee.
+

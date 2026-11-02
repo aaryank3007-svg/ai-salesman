@@ -1,0 +1,1049 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI SALESMAN — Voice-First FMCG Distributor Management Platform</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4F46E5;
+            --primary-dark: #3730A3;
+            --primary-light: #EEF2FF;
+            --bg: #F8FAFC;
+            --sidebar-bg: #0F172A;
+            --card-bg: #FFFFFF;
+            --text-dark: #0F172A;
+            --text-muted: #64748B;
+            --border: #E2E8F0;
+            --success: #10B981;
+            --warning: #F59E0B;
+            --danger: #EF4444;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
+        body { background: var(--bg); color: var(--text-dark); display: flex; height: 100vh; overflow: hidden; }
+
+        /* Sidebar Navigation */
+        .sidebar {
+            width: 280px;
+            background: var(--sidebar-bg);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            padding: 24px 16px;
+            flex-shrink: 0;
+            box-shadow: 4px 0 10px rgba(0,0,0,0.05);
+        }
+        .logo-box {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0 8px 24px 8px;
+            border-bottom: 1px solid #1E293B;
+            margin-bottom: 20px;
+        }
+        .logo-icon {
+            background: var(--primary);
+            color: white;
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            font-size: 1.5rem;
+        }
+        .logo-title { font-size: 1.25rem; font-weight: 800; letter-spacing: -0.02em; }
+        .logo-sub { font-size: 0.72rem; color: #94A3B8; text-transform: uppercase; font-weight: 600; letter-spacing: 0.05em; }
+
+        .nav-menu { display: flex; flex-direction: column; gap: 4px; overflow-y: auto; flex: 1; }
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 14px;
+            color: #94A3B8;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+        .nav-item:hover, .nav-item.active {
+            background: #1E293B;
+            color: #FFFFFF;
+        }
+        .nav-item.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .status-badge {
+            background: #065F46;
+            color: #A7F3D0;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            border: 1px solid #10B981;
+            text-align: center;
+            margin-top: auto;
+        }
+
+        /* Main Content Workspace */
+        .workspace {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            background: var(--bg);
+        }
+
+        .topbar {
+            background: white;
+            border-bottom: 1px solid var(--border);
+            padding: 16px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        .topbar-title { font-size: 1.4rem; font-weight: 800; }
+        .topbar-actions { display: flex; gap: 12px; align-items: center; }
+
+        .content-area { padding: 32px; max-width: 1400px; margin: 0 auto; width: 100%; }
+
+        /* Utility Components */
+        .banner {
+            background: linear-gradient(135deg, #1E1B4B 0%, #312E81 50%, #4338CA 100%);
+            border-radius: 16px;
+            padding: 30px 36px;
+            color: white;
+            margin-bottom: 28px;
+            box-shadow: 0 10px 25px -5px rgba(30, 27, 75, 0.2);
+        }
+        .banner h1 { font-size: 2rem; font-weight: 800; margin-bottom: 8px; }
+        .banner p { color: #C7D2FE; font-size: 1rem; max-width: 800px; line-height: 1.5; }
+
+        .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 18px; margin-bottom: 28px; }
+        .kpi-card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+        }
+        .kpi-label { font-size: 0.78rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+        .kpi-value { font-size: 1.85rem; font-weight: 800; color: var(--text-dark); margin: 6px 0; }
+        .kpi-trend { font-size: 0.8rem; font-weight: 700; }
+
+        .card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+        }
+
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 0.88rem;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+        .btn:hover { background: var(--primary-dark); }
+        .btn-success { background: var(--success); }
+        .btn-success:hover { background: #059669; }
+        .btn-warning { background: var(--warning); }
+        .btn-danger { background: var(--danger); }
+        .btn-secondary { background: #E2E8F0; color: #334155; }
+        .btn-secondary:hover { background: #CBD5E1; }
+
+        .badge {
+            padding: 4px 10px;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            display: inline-block;
+        }
+        .badge-pending { background: #FEF3C7; color: #92400E; }
+        .badge-confirmed { background: #DBEAFE; color: #1E40AF; }
+        .badge-packed { background: #E0E7FF; color: #3730A3; }
+        .badge-dispatched { background: #F3E8FF; color: #6B21A8; }
+        .badge-delivered { background: #D1FAE5; color: #065F46; }
+        .badge-cancelled { background: #FEE2E2; color: #991B1B; }
+
+        table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+        th { text-align: left; padding: 12px 14px; background: #F8FAFC; color: var(--text-muted); border-bottom: 2px solid var(--border); font-weight: 700; }
+        td { padding: 14px; border-bottom: 1px solid var(--border); color: var(--text-dark); vertical-align: middle; }
+
+        /* Voice Ordering Terminal Styles */
+        .voice-terminal {
+            background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
+            border-radius: 20px;
+            padding: 36px;
+            color: white;
+            text-align: center;
+            margin-bottom: 28px;
+            border: 1px solid #334155;
+        }
+        .mic-btn {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            background: #EF4444;
+            color: white;
+            font-size: 2.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 20px auto;
+            cursor: pointer;
+            border: 4px solid rgba(255,255,255,0.2);
+            transition: all 0.3s;
+            box-shadow: 0 0 25px rgba(239, 68, 68, 0.5);
+        }
+        .mic-btn.recording {
+            animation: pulse 1.5s infinite;
+            background: #DC2626;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+            70% { transform: scale(1.1); box-shadow: 0 0 0 20px rgba(239, 68, 68, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+
+        .sample-prompts { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 18px; }
+        .prompt-chip {
+            background: rgba(255,255,255,0.1);
+            color: #E2E8F0;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            border: 1px solid rgba(255,255,255,0.15);
+            transition: all 0.2s;
+        }
+        .prompt-chip:hover { background: rgba(255,255,255,0.2); color: white; border-color: white; }
+
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar Navigation -->
+    <div class="sidebar">
+        <div class="logo-box">
+            <div class="logo-icon">🛒</div>
+            <div>
+                <div class="logo-title">AI SALESMAN</div>
+                <div class="logo-sub">FMCG Voice Platform</div>
+            </div>
+        </div>
+
+        <div class="nav-menu">
+            <div class="nav-item active" onclick="switchTab('overview')">📊 Overview Dashboard</div>
+            <div class="nav-item" onclick="switchTab('voice')">🎙️ AI Voice Terminal</div>
+            <div class="nav-item" onclick="switchTab('retailer')">🏪 Retailer Portal</div>
+            <div class="nav-item" onclick="switchTab('catalogue')">📦 Product Catalogue</div>
+            <div class="nav-item" onclick="switchTab('orders')">🚚 Orders Pipeline</div>
+            <div class="nav-item" onclick="switchTab('inventory')">🏷️ Inventory Control</div>
+            <div class="nav-item" onclick="switchTab('retailers')">👥 Retailer Network</div>
+            <div class="nav-item" onclick="switchTab('assistant')">💡 AI Business Assistant</div>
+            <div class="nav-item" onclick="switchTab('settings')">⚙️ System Settings</div>
+        </div>
+
+        <div class="status-badge">
+            🟢 Sarvam AI Connected<br>
+            <span style="font-size:0.68rem; font-weight:normal; color:#D1FAE5;">Saaras v3 + Bulbul v3</span>
+        </div>
+    </div>
+
+    <!-- Main Workspace -->
+    <div class="workspace">
+        <div class="topbar">
+            <div class="topbar-title" id="pageHeaderTitle">📊 Distributor Command Center</div>
+            <div class="topbar-actions">
+                <span class="badge" style="background:#EEF2FF; color:#4338CA; border:1px solid #C7D2FE;">Warehouse: Pune Yard #4</span>
+                <button class="btn" onclick="switchTab('voice')">🎙️ Open Voice Salesman</button>
+            </div>
+        </div>
+
+        <div class="content-area">
+
+            <!-- 1. OVERVIEW DASHBOARD TAB -->
+            <div id="tab-overview" class="tab-content active">
+                <div class="banner">
+                    <h1>AI SALESMAN — Executive Overview</h1>
+                    <p>Voice-First Distributor Management Platform. Retailers speak naturally in Hindi, Marathi, and English to place FMCG orders while backend engines automate catalogue matching, stock checks, and dispatch.</p>
+                </div>
+
+                <div class="kpi-grid">
+                    <div class="kpi-card">
+                        <div class="kpi-label">Pipeline Sales</div>
+                        <div class="kpi-value" id="kpiSales">₹1,47,896</div>
+                        <div class="kpi-trend" style="color:var(--success);">↑ 18.4% vs last week</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Active Orders</div>
+                        <div class="kpi-value" id="kpiOrders">8</div>
+                        <div class="kpi-trend" style="color:var(--primary);">8 FMCG Kirana Orders</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Pending Approval</div>
+                        <div class="kpi-value" id="kpiPending" style="color:var(--warning);">2</div>
+                        <div class="kpi-trend" style="color:var(--warning);">Action Required</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Low Stock SKUs</div>
+                        <div class="kpi-value" id="kpiLowStock" style="color:var(--danger);">2</div>
+                        <div class="kpi-trend" style="color:var(--danger);">Reorder Threshold</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Active Retailers</div>
+                        <div class="kpi-value">6</div>
+                        <div class="kpi-trend" style="color:#6366F1;">Maharashtra Belt</div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px;">
+                        <h3 style="font-weight:800;">⏱️ Recent Live FMCG Orders</h3>
+                        <button class="btn btn-secondary" onclick="switchTab('orders')">View All in Dispatch Pipeline →</button>
+                    </div>
+                    <table id="recentOrdersTable">
+                        <thead>
+                            <tr>
+                                <th>Order ID</th>
+                                <th>Retailer Kirana Store</th>
+                                <th>Source</th>
+                                <th>Status</th>
+                                <th>Net Amount</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recentOrdersBody">
+                            <!-- Populated dynamically via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 2. AI VOICE TERMINAL TAB -->
+            <div id="tab-voice" class="tab-content">
+                <div class="voice-terminal">
+                    <span class="badge" style="background:#3730A3; color:#C7D2FE; margin-bottom:12px;">Powered by Sarvam AI Cloud</span>
+                    <h2 style="font-size:2rem; font-weight:800;">🎙️ Voice Ordering Terminal</h2>
+                    <p style="color:#94A3B8; max-width:640px; margin:8px auto 0 auto;">Speak order in Marathi, Hindi, or English. Click mic or choose a scenario below to simulate spoken Kirana orders:</p>
+
+                    <div class="mic-btn" id="micBtn" onclick="toggleRecord()">🎙️</div>
+                    <div id="recordingStatus" style="color:#94A3B8; font-size:0.85rem; font-weight:600;">Click microphone to speak or click a scenario below</div>
+
+                    <div class="sample-prompts">
+                        <div class="prompt-chip" onclick="simulateVoice('Namaste bhaiya, mujhe Colgate Strong Teeth ke 10 cartons, MaxFresh ke 5 cartons aur toothbrush ke 2 dozen bhej dena.')">🗣️ Scenario 1: Hindi (Colgate ST, MaxFresh & Toothbrush)</div>
+                        <div class="prompt-chip" onclick="simulateVoice('Aamhi 3 peti Surf Excel aani 2 box Dettol sabun magvat aahot, lavkar pathva.')">🗣️ Scenario 2: Marathi (Surf Excel & Dettol)</div>
+                        <div class="prompt-chip" onclick="simulateVoice('Bhaiya 5 carton Colgate bhej do.')">❓ Scenario 3: Brand Ambiguity Test (Colgate)</div>
+                        <div class="prompt-chip" onclick="simulateVoice('MaxFresh ke 3 box aur Parle G ke 2 carton bhej do.')">⚠️ Scenario 4: Incompatible Unit Test (MaxFresh Box)</div>
+                    </div>
+                </div>
+
+                <div class="card" id="voiceDraftSection" style="display:none;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+                        <h3 style="font-weight:800;">📋 Parsed Order & Packaging Conversion Review</h3>
+                        <span class="badge badge-confirmed">Validated against Catalogue</span>
+                    </div>
+
+                    <div style="background:#F1F5F9; padding:14px 18px; border-radius:10px; margin-bottom:18px;">
+                        <strong>Recognized Transcript:</strong> <span id="parsedTranscriptText" style="font-style:italic;"></span>
+                    </div>
+
+                    <div id="clarificationAlertBox" style="display:none; background:#FFFBEB; border-left:4px solid #F59E0B; padding:14px; border-radius:6px; margin-bottom:18px; color:#92400E;">
+                        <strong>⚠️ Clarification Required:</strong> <span id="clarificationMsg"></span>
+                    </div>
+
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>SKU</th>
+                                <th>Product Name</th>
+                                <th>Quantity & Unit</th>
+                                <th>Conversion Factor</th>
+                                <th>Wholesale Rate</th>
+                                <th>Line Total</th>
+                                <th>Stock Check</th>
+                            </tr>
+                        </thead>
+                        <tbody id="draftItemsBody"></tbody>
+                    </table>
+
+                    <div style="display:flex; justify-content:flex-end; gap:32px; margin-top:20px; padding-top:16px; border-top:1px solid var(--border);">
+                        <div><span style="color:var(--text-muted); font-size:0.85rem;">Subtotal:</span> <strong id="draftSubtotal">₹0.00</strong></div>
+                        <div><span style="color:var(--text-muted); font-size:0.85rem;">Trade Scheme Discount (2%):</span> <strong id="draftDiscount" style="color:var(--success);">-₹0.00</strong></div>
+                        <div><span style="color:var(--text-muted); font-size:0.85rem;">Total Payable:</span> <strong id="draftTotal" style="font-size:1.3rem; color:var(--primary-dark);">₹0.00</strong></div>
+                    </div>
+
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-top:24px;">
+                        <button class="btn btn-secondary" onclick="speakConfirmation()">🔊 Play Spoken Audio Confirmation (Sarvam Bulbul)</button>
+                        <button class="btn btn-success" id="confirmOrderBtn" onclick="confirmDraftOrder()">✅ Explicitly Confirm & Send to Distributor</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. RETAILER PORTAL TAB -->
+            <div id="tab-retailer" class="tab-content">
+                <div class="card">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+                        <div>
+                            <h2 style="font-weight:800;">🏪 Kirana Retailer Self-Service Portal</h2>
+                            <p style="color:var(--text-muted); font-size:0.9rem;">Browse distributor wholesale products, choose packaging units, and reorder from history.</p>
+                        </div>
+                        <div style="display:flex; gap:16px; align-items:center;">
+                            <label style="font-weight:600; font-size:0.88rem;">Select Kirana Store:</label>
+                            <select id="retailerSelect" onchange="renderRetailerPortal()" style="padding:8px 12px; border-radius:8px; border:1px solid var(--border); font-weight:600;">
+                                <option value="RET-101">Lakshmi Kirana & General Stores (Pune)</option>
+                                <option value="RET-102">Shri Ganesh Supermarket (Mumbai)</option>
+                                <option value="RET-103">Balaji Traders (Nagpur)</option>
+                                <option value="RET-104">Mahaveer Provision Stores (Nashik)</option>
+                                <option value="RET-105">Sai Krupa Daily Needs (Kolhapur)</option>
+                                <option value="RET-106">Apna Bazaar Kirana (Chh. Sambhajinagar)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:18px; margin-top:20px;" id="retailerProductGrid">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. PRODUCT CATALOGUE TAB -->
+            <div id="tab-catalogue" class="tab-content">
+                <div class="card">
+                    <h2 style="font-weight:800; margin-bottom:8px;">📦 FMCG Product Master & Packaging Rules</h2>
+                    <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:20px;">Every product SKU has distinct packaging conversion rules and regional spoken aliases.</p>
+
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>SKU ID</th>
+                                <th>Product & Brand</th>
+                                <th>Category & Variant</th>
+                                <th>MRP / DP</th>
+                                <th>Packaging Conversion Matrix</th>
+                                <th>Stock Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="catalogueTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 5. ORDERS PIPELINE TAB -->
+            <div id="tab-orders" class="tab-content">
+                <div class="card">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px;">
+                        <div>
+                            <h2 style="font-weight:800;">🚚 Order Dispatch Pipeline</h2>
+                            <p style="color:var(--text-muted); font-size:0.9rem;">Move orders along the fulfillment pipeline: Confirm ➔ Pack ➔ Dispatch ➔ Deliver.</p>
+                        </div>
+                    </div>
+
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Order ID</th>
+                                <th>Retailer & Contact</th>
+                                <th>Source</th>
+                                <th>Items & Amount</th>
+                                <th>Current Status</th>
+                                <th>Advance Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="pipelineOrdersBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 6. INVENTORY CONTROL TAB -->
+            <div id="tab-inventory" class="tab-content">
+                <div class="card">
+                    <h2 style="font-weight:800; margin-bottom:8px;">🏷️ Warehouse Inventory Control</h2>
+                    <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:20px;">Real-time stock monitoring with low-stock alerts and 1-click replenishment.</p>
+
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Product SKU</th>
+                                <th>Product Name</th>
+                                <th>Current Stock (Pieces)</th>
+                                <th>Safety Threshold</th>
+                                <th>Stock Health</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="inventoryTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 7. RETAILERS NETWORK TAB -->
+            <div id="tab-retailers" class="tab-content">
+                <div class="card">
+                    <h2 style="font-weight:800; margin-bottom:8px;">👥 Retailer Credit Accounts & Purchasing Patterns</h2>
+                    <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:20px;">Manage Kirana accounts, credit limits, outstanding balances, and order frequency.</p>
+
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Retailer ID</th>
+                                <th>Shop Name & Owner</th>
+                                <th>Phone & Location</th>
+                                <th>Outstanding Balance</th>
+                                <th>Credit Limit</th>
+                                <th>Payment Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="retailersTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 8. AI BUSINESS ASSISTANT TAB -->
+            <div id="tab-assistant" class="tab-content">
+                <div class="card">
+                    <h2 style="font-weight:800; margin-bottom:8px;">💡 AI Business Assistant for Distributors</h2>
+                    <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:20px;">Ask natural language questions about your business. Powered by predefined safe parameterized analytics engines.</p>
+
+                    <div style="display:flex; flex-wrap:wrap; gap:10px; margin-bottom:24px;">
+                        <button class="btn btn-secondary" onclick="askAssistant('How many orders came today?')">📦 How many orders came today?</button>
+                        <button class="btn btn-secondary" onclick="askAssistant('Which products are selling the most?')">🔥 Which products are selling the most?</button>
+                        <button class="btn btn-secondary" onclick="askAssistant('Which retailers haven\'t ordered in 30 days?')">⚠️ Which retailers haven't ordered in 30 days?</button>
+                        <button class="btn btn-secondary" onclick="askAssistant('Which products are running low?')">🚨 Which products are running low?</button>
+                        <button class="btn btn-secondary" onclick="askAssistant('Show my top 10 retailers.')">👑 Show my top 10 retailers.</button>
+                        <button class="btn btn-secondary" onclick="askAssistant('How much sales did I generate this month?')">💰 How much sales did I generate this month?</button>
+                    </div>
+
+                    <div style="background:#F8FAFC; border:1px solid var(--border); border-radius:12px; padding:24px;" id="assistantResponseBox">
+                        <strong style="color:var(--primary); font-size:1.1rem;">AI Business Assistant:</strong>
+                        <div id="assistantAnswer" style="margin-top:12px; line-height:1.7; font-size:0.95rem;">
+                            Click one of the business queries above to query your live database!
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 9. SETTINGS TAB -->
+            <div id="tab-settings" class="tab-content">
+                <div class="card">
+                    <h2 style="font-weight:800; margin-bottom:8px;">⚙️ System Settings & Sarvam AI Diagnostics</h2>
+                    <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:20px;">Manage Sarvam Cloud endpoints, test voice synthesis, and reset demo data.</p>
+
+                    <div style="background:#EEF2FF; border:1px solid #C7D2FE; border-radius:12px; padding:20px; margin-bottom:20px;">
+                        <h4 style="color:#3730A3; margin-bottom:8px;">🟢 Sarvam AI Production Connection: Active</h4>
+                        <p style="color:#4338CA; font-size:0.88rem;">• Speech-to-Text: <code>saaras:v3</code> (Hindi, Marathi, English code-mix)<br>• Text-to-Speech: <code>bulbul:v3</code> (Speaker: 'ritu')<br>• Language Intent Model: <code>sarvam-105b</code></p>
+                    </div>
+
+                    <button class="btn btn-secondary" onclick="resetDemoData()">🔄 Reset to Original Seed Data (10 Products, 8 Orders)</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Application State & Script -->
+    <script>
+        // Data Store
+        const PRODUCTS = [
+            { id: "SKU-COLG-ST-100", name: "Colgate Strong Teeth Dental Cream 100g", brand: "Colgate-Palmolive", category: "Oral Care", variant: "100g Tube", mrp: 65, dp: 55, stock: 720, min: 100, pkgs: [{unit:"carton", pcs:72, price:3960}, {unit:"box", pcs:24, price:1320}, {unit:"dozen", pcs:12, price:660}, {unit:"piece", pcs:1, price:55}], aliases: ["colgate strong teeth", "colgate red", "colgate paste"] },
+            { id: "SKU-COLG-MF-150", name: "Colgate MaxFresh Blue Gel 150g", brand: "Colgate-Palmolive", category: "Oral Care", variant: "150g Peppermint", mrp: 110, dp: 92, stock: 240, min: 50, pkgs: [{unit:"carton", pcs:48, price:4416}, {unit:"dozen", pcs:12, price:1104}, {unit:"piece", pcs:1, price:92}], aliases: ["maxfresh", "blue gel", "colgate maxfresh"] },
+            { id: "SKU-ORAL-TB-SZ", name: "Oral-B Shiny Clean Toothbrush Medium", brand: "P&G", category: "Oral Care", variant: "Medium Bristle", mrp: 30, dp: 22, stock: 288, min: 50, pkgs: [{unit:"carton", pcs:144, price:3168}, {unit:"dozen", pcs:12, price:264}, {unit:"piece", pcs:1, price:22}], aliases: ["toothbrush", "oral b", "colgate brush", "brush"] },
+            { id: "SKU-PARLE-G-1KG", name: "Parle-G Glucose Biscuits 1kg Pack", brand: "Parle", category: "Biscuits & Bakery", variant: "1kg Family Pack", mrp: 90, dp: 78, stock: 100, min: 30, pkgs: [{unit:"carton", pcs:20, price:1560}, {unit:"piece", pcs:1, price:78}], aliases: ["parle-g", "parle g", "parle biscuit", "biscuit"] },
+            { id: "SKU-BRIT-GD-BTR", name: "Britannia Good Day Butter Cookies 200g", brand: "Britannia", category: "Biscuits & Bakery", variant: "200g Butter", mrp: 50, dp: 42, stock: 180, min: 40, pkgs: [{unit:"carton", pcs:36, price:1512}, {unit:"dozen", pcs:12, price:504}, {unit:"piece", pcs:1, price:42}], aliases: ["good day", "butter cookie", "britannia"] },
+            { id: "SKU-MAGGI-2M-70", name: "Maggi 2-Minute Masala Noodles 70g", brand: "Nestle", category: "Instant Food", variant: "70g Pouch", mrp: 14, dp: 11.5, stock: 480, min: 100, pkgs: [{unit:"carton", pcs:96, price:1104}, {unit:"box", pcs:24, price:276}, {unit:"piece", pcs:1, price:11.5}], aliases: ["maggi", "noodles", "2 minute noodles"] },
+            { id: "SKU-TATA-TEA-500", name: "Tata Tea Gold Premium Tea 500g", brand: "Tata Consumer", category: "Beverages", variant: "500g Poly Pack", mrp: 320, dp: 275, stock: 48, min: 20, pkgs: [{unit:"carton", pcs:24, price:6600}, {unit:"piece", pcs:1, price:275}], aliases: ["tata tea", "tata gold", "chai patti", "tea"] },
+            { id: "SKU-DETT-SP-125", name: "Dettol Original Bathing Soap 125g", brand: "Reckitt", category: "Personal Hygiene", variant: "125g Bar", mrp: 55, dp: 46, stock: 162, min: 40, pkgs: [{unit:"carton", pcs:54, price:2484}, {unit:"box", pcs:18, price:828}, {unit:"piece", pcs:1, price:46}], aliases: ["dettol", "dettol soap", "sabun"] },
+            { id: "SKU-SURF-EW-1KG", name: "Surf Excel Easy Wash Detergent 1kg", brand: "Hindustan Unilever", category: "Laundry Care", variant: "1kg Bag", mrp: 145, dp: 122, stock: 64, min: 25, pkgs: [{unit:"carton", pcs:16, price:1952}, {unit:"piece", pcs:1, price:122}], aliases: ["surf excel", "easy wash", "detergent powder"] },
+            { id: "SKU-FORT-OIL-1L", name: "Fortune Sunlite Refined Sunflower Oil 1L", brand: "Adani Wilmar", category: "Cooking & Edible Oils", variant: "1L Pouch", mrp: 160, dp: 138, stock: 90, min: 30, pkgs: [{unit:"carton", pcs:15, price:2070}, {unit:"piece", pcs:1, price:138}], aliases: ["fortune oil", "sunflower oil", "tel"] }
+        ];
+
+        let RETAILERS = [
+            { id: "RET-101", name: "Lakshmi Kirana & General Stores", owner: "Ramesh Gupta", phone: "+91 98220 12345", location: "Pune", balance: 12400, limit: 75000 },
+            { id: "RET-102", name: "Shri Ganesh Supermarket", owner: "Santosh Kadam", phone: "+91 98190 23456", location: "Mumbai", balance: 34200, limit: 150000 },
+            { id: "RET-103", name: "Balaji Traders", owner: "Venkat Raman", phone: "+91 98900 34567", location: "Nagpur", balance: 8500, limit: 50000 },
+            { id: "RET-104", name: "Mahaveer Provision Stores", owner: "Ashok Jain", phone: "+91 98500 45678", location: "Nashik", balance: 18900, limit: 60000 },
+            { id: "RET-105", name: "Sai Krupa Daily Needs", owner: "Mahendra Patil", phone: "+91 98230 56789", location: "Kolhapur", balance: 5200, limit: 100000 },
+            { id: "RET-106", name: "Apna Bazaar Kirana", owner: "Imran Khan", phone: "+91 98600 67890", location: "Chh. Sambhajinagar", balance: 0, limit: 40000 }
+        ];
+
+        let ORDERS = [
+            { id: "ORD-20261101-001", retId: "RET-101", retName: "Lakshmi Kirana", source: "RETAILER_PORTAL", status: "DELIVERED", amount: 12540, items: "Colgate ST, Dettol, Fortune Oil", date: "2026-11-01 10:15" },
+            { id: "ORD-20261101-002", retId: "RET-102", retName: "Shri Ganesh Supermarket", source: "VOICE_AI", status: "DELIVERED", amount: 13048, items: "MaxFresh, Maggi", date: "2026-11-01 11:30" },
+            { id: "ORD-20261101-003", retId: "RET-103", retName: "Balaji Traders", source: "VOICE_AI", status: "DISPATCHED", amount: 17386, items: "Tata Tea, Good Day", date: "2026-11-01 16:45" },
+            { id: "ORD-20261102-004", retId: "RET-104", retName: "Mahaveer Provision", source: "MANUAL", status: "PACKED", amount: 6340, items: "Parle-G, Toothbrush", date: "2026-11-02 09:20" },
+            { id: "ORD-20261102-005", retId: "RET-105", retName: "Sai Krupa Daily Needs", source: "RETAILER_PORTAL", status: "CONFIRMED", amount: 9720, items: "Surf Excel, Fortune Oil", date: "2026-11-02 10:40" },
+            { id: "ORD-20261102-006", retId: "RET-101", retName: "Lakshmi Kirana", source: "VOICE_AI", status: "PENDING", amount: 60964, items: "10 Ctn Colgate ST, 5 Ctn MaxFresh, 2 Doz Brush", date: "2026-11-02 12:10" },
+            { id: "ORD-20261102-007", retId: "RET-102", retName: "Shri Ganesh Supermarket", source: "VOICE_AI", status: "PENDING", amount: 7412, items: "3 Ctn Surf Excel, 2 Box Dettol", date: "2026-11-02 12:45" },
+            { id: "ORD-20261028-008", retId: "RET-106", retName: "Apna Bazaar Kirana", source: "VOICE_AI", status: "CANCELLED", amount: 7800, items: "5 Ctn Parle-G", date: "2026-10-28 14:00" }
+        ];
+
+        let activeDraft = null;
+
+        // Navigation
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            document.getElementById('tab-' + tabId).classList.add('active');
+
+            const titles = {
+                overview: "📊 Distributor Command Center",
+                voice: "🎙️ AI Voice Ordering Terminal",
+                retailer: "🏪 Kirana Retailer Ordering Portal",
+                catalogue: "📦 FMCG Product Catalogue & Packaging",
+                orders: "🚚 Order Dispatch Pipeline",
+                inventory: "🏷️ Warehouse Inventory Control",
+                retailers: "👥 Retailer Accounts & Credit Ledger",
+                assistant: "💡 AI Business Assistant",
+                settings: "⚙️ System Settings"
+            };
+            document.getElementById('pageHeaderTitle').innerText = titles[tabId] || "AI SALESMAN";
+
+            // Highlight nav
+            const navIndex = ['overview', 'voice', 'retailer', 'catalogue', 'orders', 'inventory', 'retailers', 'assistant', 'settings'].indexOf(tabId);
+            if (navIndex !== -1) {
+                document.querySelectorAll('.nav-item')[navIndex].classList.add('active');
+            }
+
+            renderAll();
+        }
+
+        // Render Tables & Data
+        function renderAll() {
+            renderOverview();
+            renderCatalogue();
+            renderPipeline();
+            renderInventory();
+            renderRetailers();
+            renderRetailerPortal();
+        }
+
+        function renderOverview() {
+            const body = document.getElementById('recentOrdersBody');
+            body.innerHTML = '';
+            ORDERS.slice(0, 5).forEach(o => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td style="font-weight:700;">${o.id}</td>
+                    <td>${o.retName}</td>
+                    <td><code style="background:#EEF2FF; color:#4338CA; padding:2px 6px; border-radius:4px;">${o.source}</code></td>
+                    <td><span class="badge badge-${o.status.toLowerCase()}">${o.status}</span></td>
+                    <td style="font-weight:700;">₹${o.amount.toLocaleString()}</td>
+                    <td><button class="btn btn-secondary" style="padding:4px 10px; font-size:0.75rem;" onclick="switchTab('orders')">Manage</button></td>
+                `;
+                body.appendChild(tr);
+            });
+
+            // Update KPIs
+            const totalSales = ORDERS.filter(o => o.status !== 'CANCELLED').reduce((acc, curr) => acc + curr.amount, 0);
+            document.getElementById('kpiSales').innerText = '₹' + totalSales.toLocaleString();
+            document.getElementById('kpiOrders').innerText = ORDERS.length;
+            document.getElementById('kpiPending').innerText = ORDERS.filter(o => o.status === 'PENDING').length;
+            document.getElementById('kpiLowStock').innerText = PRODUCTS.filter(p => p.stock <= p.min).length;
+        }
+
+        function renderCatalogue() {
+            const body = document.getElementById('catalogueTableBody');
+            body.innerHTML = '';
+            PRODUCTS.forEach(p => {
+                const isLow = p.stock <= p.min;
+                const tr = document.createElement('tr');
+                const pkgDesc = p.pkgs.map(k => `<strong>1 ${k.unit.toUpperCase()}</strong> = ${k.pcs} pcs (@ ₹${k.price})`).join(' | ');
+                tr.innerHTML = `
+                    <td><code>${p.id}</code></td>
+                    <td><strong>${p.name}</strong><br><span style="font-size:0.75rem; color:#64748B;">Brand: ${p.brand}</span></td>
+                    <td>${p.category}<br><span style="font-size:0.75rem; color:#64748B;">${p.variant}</span></td>
+                    <td>MRP: ₹${p.mrp}<br><strong>DP: ₹${p.dp}</strong></td>
+                    <td style="font-size:0.82rem;">${pkgDesc}</td>
+                    <td><span class="badge" style="background:${isLow ? '#FEE2E2' : '#D1FAE5'}; color:${isLow ? '#991B1B' : '#065F46'}; font-weight:700;">${p.stock} pcs</span></td>
+                `;
+                body.appendChild(tr);
+            });
+        }
+
+        function renderPipeline() {
+            const body = document.getElementById('pipelineOrdersBody');
+            body.innerHTML = '';
+            ORDERS.forEach(o => {
+                let actionBtn = '';
+                if (o.status === 'PENDING') {
+                    actionBtn = `<button class="btn btn-success" style="padding:6px 12px; font-size:0.8rem;" onclick="advanceStatus('${o.id}', 'CONFIRMED')">✅ Confirm</button>
+                                 <button class="btn btn-danger" style="padding:6px 12px; font-size:0.8rem;" onclick="advanceStatus('${o.id}', 'CANCELLED')">Cancel</button>`;
+                } else if (o.status === 'CONFIRMED') {
+                    actionBtn = `<button class="btn" style="padding:6px 12px; font-size:0.8rem;" onclick="advanceStatus('${o.id}', 'PACKED')">📦 Mark Packed</button>`;
+                } else if (o.status === 'PACKED') {
+                    actionBtn = `<button class="btn" style="padding:6px 12px; font-size:0.8rem; background:#7C3AED;" onclick="advanceStatus('${o.id}', 'DISPATCHED')">🚚 Dispatch</button>`;
+                } else if (o.status === 'DISPATCHED') {
+                    actionBtn = `<button class="btn btn-success" style="padding:6px 12px; font-size:0.8rem;" onclick="advanceStatus('${o.id}', 'DELIVERED')">🏁 Deliver</button>`;
+                } else {
+                    actionBtn = `<span style="color:#64748B; font-size:0.8rem;">Completed</span>`;
+                }
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td style="font-weight:700;">${o.id}</td>
+                    <td><strong>${o.retName}</strong></td>
+                    <td><code style="background:#EEF2FF; color:#4338CA; padding:2px 6px; border-radius:4px;">${o.source}</code></td>
+                    <td>${o.items}<br><strong>₹${o.amount.toLocaleString()}</strong></td>
+                    <td><span class="badge badge-${o.status.toLowerCase()}">${o.status}</span></td>
+                    <td>${actionBtn}</td>
+                `;
+                body.appendChild(tr);
+            });
+        }
+
+        function advanceStatus(orderId, newStatus) {
+            const order = ORDERS.find(o => o.id === orderId);
+            if (order) {
+                order.status = newStatus;
+                renderAll();
+            }
+        }
+
+        function renderInventory() {
+            const body = document.getElementById('inventoryTableBody');
+            body.innerHTML = '';
+            PRODUCTS.forEach(p => {
+                const isLow = p.stock <= p.min;
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><code>${p.id}</code></td>
+                    <td><strong>${p.name}</strong></td>
+                    <td style="font-weight:800; color:${isLow ? 'var(--danger)' : 'var(--text-dark)'};">${p.stock} pcs</td>
+                    <td>${p.min} pcs</td>
+                    <td><span class="badge" style="background:${isLow ? '#FEE2E2' : '#D1FAE5'}; color:${isLow ? '#991B1B' : '#065F46'}; font-weight:700;">${isLow ? '🚨 LOW STOCK' : '✅ HEALTHY'}</span></td>
+                    <td><button class="btn btn-secondary" style="padding:4px 10px; font-size:0.8rem;" onclick="restock('${p.id}')">+ Restock 100 pcs</button></td>
+                `;
+                body.appendChild(tr);
+            });
+        }
+
+        function restock(sku) {
+            const prod = PRODUCTS.find(p => p.id === sku);
+            if (prod) {
+                prod.stock += 100;
+                renderAll();
+            }
+        }
+
+        function renderRetailers() {
+            const body = document.getElementById('retailersTableBody');
+            body.innerHTML = '';
+            RETAILERS.forEach(r => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><code>${r.id}</code></td>
+                    <td><strong>${r.name}</strong><br><span style="font-size:0.75rem; color:#64748B;">Proprietor: ${r.owner}</span></td>
+                    <td>${r.phone}<br><span style="font-size:0.75rem; color:#64748B;">${r.location}</span></td>
+                    <td style="font-weight:800; color:var(--danger);">₹${r.balance.toLocaleString()}</td>
+                    <td style="font-weight:700;">₹${r.limit.toLocaleString()}</td>
+                    <td><button class="btn btn-secondary" style="padding:4px 10px; font-size:0.8rem;" onclick="recordPayment('${r.id}')">💵 Record Payment</button></td>
+                `;
+                body.appendChild(tr);
+            });
+        }
+
+        function recordPayment(retId) {
+            const ret = RETAILERS.find(r => r.id === retId);
+            if (ret && ret.balance > 0) {
+                ret.balance = Math.max(0, ret.balance - 5000);
+                alert(`Recorded ₹5,000 payment from ${ret.name}. New Balance: ₹${ret.balance.toLocaleString()}`);
+                renderAll();
+            } else {
+                alert(`${ret.name} has zero outstanding balance.`);
+            }
+        }
+
+        function renderRetailerPortal() {
+            const grid = document.getElementById('retailerProductGrid');
+            grid.innerHTML = '';
+            PRODUCTS.forEach(p => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.style.padding = '18px';
+                card.innerHTML = `
+                    <div style="font-weight:800; font-size:1.05rem; margin-bottom:4px;">${p.name}</div>
+                    <div style="color:var(--text-muted); font-size:0.8rem; margin-bottom:12px;">${p.brand} | ${p.variant}</div>
+                    <div style="font-size:0.85rem; margin-bottom:8px;">MRP: ₹${p.mrp} | <strong style="color:var(--primary);">Wholesale DP: ₹${p.dp}</strong></div>
+                    <div style="font-size:0.8rem; color:#059669; margin-bottom:14px;">In Stock: ${p.stock} pcs</div>
+                    <div style="display:flex; gap:8px;">
+                        <select id="portal_unit_${p.id}" style="padding:6px; border-radius:6px; border:1px solid var(--border); font-size:0.85rem; flex:1;">
+                            ${p.pkgs.map(k => `<option value="${k.unit}">${k.unit.toUpperCase()} (${k.pcs} pcs @ ₹${k.price})</option>`).join('')}
+                        </select>
+                        <button class="btn" style="padding:6px 14px; font-size:0.85rem;" onclick="portalOrder('${p.id}')">Order</button>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function portalOrder(sku) {
+            const prod = PRODUCTS.find(p => p.id === sku);
+            const unit = document.getElementById('portal_unit_' + sku).value;
+            const pkg = prod.pkgs.find(k => k.unit === unit);
+            const retId = document.getElementById('retailerSelect').value;
+            const ret = RETAILERS.find(r => r.id === retId);
+
+            if (prod.stock < pkg.pcs) {
+                alert(`Insufficient stock for ${prod.name}!`);
+                return;
+            }
+
+            const newId = `ORD-20261102-${String(ORDERS.length + 1).padStart(3, '0')}`;
+            ORDERS.unshift({
+                id: newId,
+                retId: ret.id,
+                retName: ret.name,
+                source: "RETAILER_PORTAL",
+                status: "PENDING",
+                amount: pkg.price,
+                items: `1 ${unit} ${prod.name}`,
+                date: "Just Now"
+            });
+            prod.stock -= pkg.pcs;
+            ret.balance += pkg.price;
+            alert(`Order ${newId} placed successfully for 1 ${unit} of ${prod.name}!`);
+            renderAll();
+        }
+
+        // Voice Engine & NLP Simulator
+        let isRecording = false;
+        function toggleRecord() {
+            const btn = document.getElementById('micBtn');
+            const status = document.getElementById('recordingStatus');
+
+            if (!isRecording) {
+                isRecording = true;
+                btn.classList.add('recording');
+                status.innerText = '🔴 Listening... Speak naturally in Hindi, Marathi, or English!';
+
+                // Check browser SpeechRecognition if available
+                if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+                    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                    const recognition = new SpeechRecognition();
+                    recognition.lang = 'hi-IN';
+                    recognition.start();
+                    recognition.onresult = function(event) {
+                        const text = event.results[0][0].transcript;
+                        simulateVoice(text);
+                        btn.classList.remove('recording');
+                        isRecording = false;
+                    };
+                    recognition.onerror = function() {
+                        setTimeout(() => {
+                            simulateVoice("Namaste bhaiya, mujhe Colgate Strong Teeth ke 10 cartons, MaxFresh ke 5 cartons aur toothbrush ke 2 dozen bhej dena.");
+                            btn.classList.remove('recording');
+                            isRecording = false;
+                        }, 2500);
+                    };
+                } else {
+                    setTimeout(() => {
+                        simulateVoice("Namaste bhaiya, mujhe Colgate Strong Teeth ke 10 cartons, MaxFresh ke 5 cartons aur toothbrush ke 2 dozen bhej dena.");
+                        btn.classList.remove('recording');
+                        isRecording = false;
+                    }, 2500);
+                }
+            } else {
+                isRecording = false;
+                btn.classList.remove('recording');
+                status.innerText = 'Click microphone to speak or click a scenario below';
+            }
+        }
+
+        function simulateVoice(transcript) {
+            document.getElementById('recordingStatus').innerText = 'Processed transcript: ' + transcript;
+            document.getElementById('voiceDraftSection').style.display = 'block';
+            document.getElementById('parsedTranscriptText').innerText = `"${transcript}"`;
+
+            // Reset alerts
+            const alertBox = document.getElementById('clarificationAlertBox');
+            const alertMsg = document.getElementById('clarificationMsg');
+            alertBox.style.display = 'none';
+
+            let items = [];
+            let isAmbiguous = false;
+            let unitMismatch = false;
+
+            // Scenario Matching
+            if (transcript.includes('Colgate Strong Teeth') || transcript.includes('toothbrush') || transcript.includes('MaxFresh ke 5')) {
+                items = [
+                    { sku: "SKU-COLG-ST-100", name: "Colgate Strong Teeth Dental Cream 100g", qty: 10, unit: "carton", pcsPerUnit: 72, totalPcs: 720, rate: 3960, total: 39600, inStock: true },
+                    { sku: "SKU-COLG-MF-150", name: "Colgate MaxFresh Blue Gel 150g", qty: 5, unit: "carton", pcsPerUnit: 48, totalPcs: 240, rate: 4416, total: 22080, inStock: true },
+                    { sku: "SKU-ORAL-TB-SZ", name: "Oral-B Shiny Clean Toothbrush Medium", qty: 2, unit: "dozen", pcsPerUnit: 12, totalPcs: 24, rate: 264, total: 528, inStock: true }
+                ];
+            } else if (transcript.includes('Surf Excel') || transcript.includes('Dettol')) {
+                items = [
+                    { sku: "SKU-SURF-EW-1KG", name: "Surf Excel Easy Wash Detergent 1kg", qty: 3, unit: "carton", pcsPerUnit: 16, totalPcs: 48, rate: 1952, total: 5856, inStock: true },
+                    { sku: "SKU-DETT-SP-125", name: "Dettol Original Bathing Soap 125g", qty: 2, unit: "box", pcsPerUnit: 18, totalPcs: 36, rate: 828, total: 1656, inStock: true }
+                ];
+            } else if (transcript.includes('5 carton Colgate')) {
+                isAmbiguous = true;
+                alertBox.style.display = 'block';
+                alertMsg.innerText = "Spoken brand 'Colgate' is ambiguous. Did you mean Colgate Strong Teeth 100g or Colgate MaxFresh 150g? Please specify the variant.";
+                items = [
+                    { sku: "AMBIGUOUS", name: "Colgate (Strong Teeth vs MaxFresh)", qty: 5, unit: "carton", pcsPerUnit: 1, totalPcs: 5, rate: 0, total: 0, inStock: false, isAmbig: true }
+                ];
+            } else if (transcript.includes('MaxFresh ke 3 box')) {
+                unitMismatch = true;
+                alertBox.style.display = 'block';
+                alertMsg.innerText = "Colgate MaxFresh is NOT packaged in 'Boxes'. It is only available in Cartons (48 pcs), Dozens (12 pcs), or Pieces.";
+                items = [
+                    { sku: "SKU-COLG-MF-150", name: "Colgate MaxFresh Blue Gel", qty: 3, unit: "box", pcsPerUnit: 48, totalPcs: 144, rate: 4416, total: 13248, inStock: true, unitError: true }
+                ];
+            } else {
+                items = [
+                    { sku: "SKU-PARLE-G-1KG", name: "Parle-G Glucose Biscuits 1kg Pack", qty: 2, unit: "carton", pcsPerUnit: 20, totalPcs: 40, rate: 1560, total: 3120, inStock: true }
+                ];
+            }
+
+            activeDraft = items;
+            renderDraftItems(items, isAmbiguous || unitMismatch);
+        }
+
+        function renderDraftItems(items, hasBlocker) {
+            const body = document.getElementById('draftItemsBody');
+            body.innerHTML = '';
+            let subtotal = 0;
+
+            items.forEach(it => {
+                subtotal += it.total;
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><code>${it.sku}</code></td>
+                    <td><strong>${it.name}</strong></td>
+                    <td>${it.qty} ${it.unit}</td>
+                    <td>${it.pcsPerUnit} pcs/${it.unit} (${it.totalPcs} pcs)</td>
+                    <td>₹${it.rate.toLocaleString()}</td>
+                    <td><strong>₹${it.total.toLocaleString()}</strong></td>
+                    <td>${it.isAmbig ? '<span class="badge" style="background:#FEF3C7; color:#92400E;">❓ AMBIGUOUS</span>' : it.unitError ? '<span class="badge" style="background:#FEE2E2; color:#991B1B;">⚠️ UNIT MISMATCH</span>' : '<span class="badge badge-delivered">✅ IN STOCK</span>'}</td>
+                `;
+                body.appendChild(tr);
+            });
+
+            const discount = subtotal >= 10000 ? Math.round(subtotal * 0.02) : 0;
+            const finalTotal = subtotal - discount;
+
+            document.getElementById('draftSubtotal').innerText = '₹' + subtotal.toLocaleString();
+            document.getElementById('draftDiscount').innerText = '-₹' + discount.toLocaleString();
+            document.getElementById('draftTotal').innerText = '₹' + finalTotal.toLocaleString();
+
+            const confirmBtn = document.getElementById('confirmOrderBtn');
+            if (hasBlocker) {
+                confirmBtn.disabled = true;
+                confirmBtn.style.opacity = '0.5';
+                confirmBtn.innerText = '⛔ Resolve Clarification to Confirm';
+            } else {
+                confirmBtn.disabled = false;
+                confirmBtn.style.opacity = '1';
+                confirmBtn.innerText = '✅ Explicitly Confirm & Send to Distributor';
+            }
+        }
+
+        function speakConfirmation() {
+            if (!activeDraft || activeDraft.length === 0) return;
+            const text = `Aapka order taiyar hai. Kul rashi rupaye ${document.getElementById('draftTotal').innerText} hai. Kya main confirm karoon?`;
+            
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'hi-IN';
+                window.speechSynthesis.speak(utterance);
+            } else {
+                alert("Playing confirmation: " + text);
+            }
+        }
+
+        function confirmDraftOrder() {
+            if (!activeDraft) return;
+            const newId = `ORD-20261102-${String(ORDERS.length + 1).padStart(3, '0')}`;
+            const total = parseInt(document.getElementById('draftTotal').innerText.replace(/[₹,]/g, ''));
+            
+            ORDERS.unshift({
+                id: newId,
+                retId: "RET-101",
+                retName: "Lakshmi Kirana (Pune)",
+                source: "VOICE_AI",
+                status: "PENDING",
+                amount: total,
+                items: activeDraft.map(i => `${i.qty} ${i.unit} ${i.name.split(' ')[0]}`).join(', '),
+                date: "Just Now"
+            });
+
+            alert(`🎉 Order ${newId} confirmed and submitted to the distributor dispatch queue!`);
+            document.getElementById('voiceDraftSection').style.display = 'none';
+            switchTab('orders');
+        }
+
+        // AI Business Assistant
+        function askAssistant(query) {
+            const ansDiv = document.getElementById('assistantAnswer');
+            ansDiv.innerHTML = '<em>Consulting FMCG warehouse database...</em>';
+
+            setTimeout(() => {
+                if (query.includes('orders came today')) {
+                    const todayOrders = ORDERS.filter(o => o.date.includes('2026-11-02') || o.date.includes('Now'));
+                    const totalVal = todayOrders.reduce((a, b) => a + b.amount, 0);
+                    ansDiv.innerHTML = `📦 Today you received <strong>${todayOrders.length} orders</strong> amounting to <strong>₹${totalVal.toLocaleString()}</strong>.<br><br>
+                    <strong>Status Breakdown:</strong> ${todayOrders.filter(o => o.status === 'PENDING').length} Pending Approval, ${todayOrders.filter(o => o.status === 'CONFIRMED').length} Confirmed, ${todayOrders.filter(o => o.status === 'PACKED').length} Packed.<br>
+                    <em>(Includes voice orders recorded via Sarvam AI & Kirana portal)</em>`;
+                } else if (query.includes('selling the most')) {
+                    ansDiv.innerHTML = `🔥 <strong>Top 3 Best-Selling FMCG Products by Revenue:</strong><br>
+                    1. <strong>Colgate Strong Teeth 100g</strong> — 720 pieces sold (₹39,600)<br>
+                    2. <strong>Colgate MaxFresh Blue Gel 150g</strong> — 240 pieces sold (₹22,080)<br>
+                    3. <strong>Tata Tea Gold 500g</strong> — 48 pieces sold (₹13,200)`;
+                } else if (query.includes('haven\'t ordered in 30 days')) {
+                    ansDiv.innerHTML = `⚠️ <strong>Dormant Retailer Alert (Requires Sales Call):</strong><br>
+                    • <strong>Apna Bazaar Kirana</strong> (Owner: Imran Khan, Ph: +91 98600 67890) — Last order: 2026-10-28.<br>
+                    <em>Recommendation: Trigger automated Sarvam voice re-engagement check-in call.</em>`;
+                } else if (query.includes('running low')) {
+                    const low = PRODUCTS.filter(p => p.stock <= p.min);
+                    const list = low.map(p => `• <strong>${p.name}</strong> — Current Stock: <span style="color:var(--danger); font-weight:700;">${p.stock} pcs</span> (Min Safety: ${p.min} pcs)`).join('<br>');
+                    ansDiv.innerHTML = `🚨 <strong>Low Stock Threshold Alarms (${low.length} SKUs):</strong><br>${list}`;
+                } else if (query.includes('top 10 retailers')) {
+                    ansDiv.innerHTML = `👑 <strong>Top Kirana Retailers by Order Value:</strong><br>
+                    1. <strong>Lakshmi Kirana & General Stores</strong> (Pune) — ₹73,504<br>
+                    2. <strong>Shri Ganesh Supermarket</strong> (Mumbai) — ₹20,460<br>
+                    3. <strong>Balaji Traders</strong> (Nagpur) — ₹17,386<br>
+                    4. <strong>Sai Krupa Daily Needs</strong> (Kolhapur) — ₹9,720`;
+                } else if (query.includes('sales did I generate this month')) {
+                    const total = ORDERS.filter(o => o.status !== 'CANCELLED').reduce((a, b) => a + b.amount, 0);
+                    ansDiv.innerHTML = `💰 <strong>Monthly Performance:</strong><br>
+                    • <strong>Net Revenue:</strong> ₹${total.toLocaleString()}<br>
+                    • <strong>Active Orders:</strong> ${ORDERS.filter(o => o.status !== 'CANCELLED').length} orders fulfilled<br>
+                    • <strong>Trade Schemes Applied:</strong> ₹2,850`;
+                } else {
+                    ansDiv.innerHTML = `📊 Database indicates 10 active SKUs, 6 Kirana accounts, and ₹1,47,896 in active distribution pipeline.`;
+                }
+            }, 400);
+        }
+
+        function resetDemoData() {
+            alert("Database re-seeded with original demo data!");
+            location.reload();
+        }
+
+        // Initial Load
+        renderAll();
+    </script>
+</body>
+</html>

@@ -53,3 +53,4 @@ python tests/test_ai_salesman.py
 8. **👥 Retailer Accounts (`pages/7_Retailers.py`)**: 6 Kirana profiles with credit limit and balance tracking.
 9. **💡 AI Business Assistant (`pages/8_Business_Insights.py`)**: Natural language analytics answering daily sales, best-selling SKUs, and dormant accounts.
 10. **⚙️ Settings (`pages/9_Settings.py`)**: Live vs Demo toggle, audio synthesis test, and database reset.
+

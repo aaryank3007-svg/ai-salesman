@@ -26,3 +26,4 @@ for p in products:
             execute_commit("UPDATE products SET stock_pieces = stock_pieces + ? WHERE id = ?", (add_qty, p["id"]))
             st.success(f"Added {add_qty} pieces to {p['name']}!")
             st.rerun()
+

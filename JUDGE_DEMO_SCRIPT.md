@@ -36,3 +36,4 @@
 
 ## Minute 4:15 - 5:00 | Closing & Impact
 - **Speaker:** "AI Salesman turns every Indian Kirana shopkeeper's voice into an instant enterprise order. It eliminates friction, saves hours for salespeople, and operates 24/7 in native Indian languages using Sarvam AI."
+

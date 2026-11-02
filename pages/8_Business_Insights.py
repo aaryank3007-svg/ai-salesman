@@ -51,3 +51,4 @@ if custom_query:
             if not df.empty:
                 fig = px.bar(df, x="name", y="stock_pieces", title="Current Stock vs Threshold", color="stock_pieces", color_continuous_scale="Reds")
                 st.plotly_chart(fig, use_container_width=True)
+

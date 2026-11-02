@@ -42,3 +42,4 @@ if st.button("Re-seed Database (10 Products, 6 Retailers, 8 Orders)"):
     seed_database()
     st.success("Database re-seeded with demo FMCG dataset!")
     st.rerun()
+
